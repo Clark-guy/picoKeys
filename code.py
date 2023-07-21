@@ -36,26 +36,72 @@ rp4 = Pin(21, Pin.IN, Pin.PULL_DOWN)
 rp5 = Pin(22, Pin.IN, Pin.PULL_DOWN)
 
 
+pitchList = [262, 277, 294, 311, 330, 349]
+previousPressed = [0,0,0,0,0,0]
+buttonsPressed = [0,0,0,0,0,0]
+playingNote = [0,0,0,0,0,0]
+
+#def noteToIndex():
+
+
 def handleButton():
+
+    spkr = PWM(Pin(0))
+    spkr.duty_u16(duty)
+    
+    #when no other notes playing, play note pressed
+    if all(v==0 for v in previousPressed):
+        print("first note!")
+        #expected behaviour:
+        # when first note pressed, that note becomes playing note
+        # when notes added, playing note changes to most recently
+        # pressed note
+        #
+        # we can do this by checking first case- no notes pressed.
+        # if no notes are pressed previously, then just play the note.
+        #
+        # otherwise, at least one note is already playing- check
+        # if a new note has been added or removed. if ADDED, set
+        # playing note to most recently pressed key
+        #spkr.freq(pitchList[])
+    elif previousPressed != buttonsPressed:
+
+        print("changed note!")
+        #spkr.freq()
+
+    #rebuild playingNote and previousPressed
+    del playingNote[:]
+    del previousPressed[:]
+    for button in buttonsPressed:
+        playingNote.append(button)
+    for button in buttonsPressed:
+        previousPressed.append(button)
+    
+    #check buttons pressed
+    del buttonsPressed[:]
     for pin in row_pins:
-        print(str(pin.value()))
-    print("\n")
-    #we now know what pins are being pressed
+        buttonsPressed.append(pin.value())
 
 
 #when button pressed
 
 while True:
-    duty+=500
+    print("playingNote " + str(playingNote))
+    print("buttonsPressed " + str(buttonsPressed))
+    print("\n")
+
+    duty+=5000
     #frequency+=1
     led.toggle()
-    utime.sleep(.02)
+    utime.sleep(.2) #replace with .02 when not debugging
     if rp0.value() or rp1.value() or rp2.value() or rp3.value() or rp4.value() or rp5.value():
-        spkr = PWM(Pin(0))
-        spkr.duty_u16(duty)
         handleButton()
     else:
         spkr.deinit()
+        previousPressed = [0,0,0,0,0,0]
+        buttonsPressed = [0,0,0,0,0,0]
+        playingNote = [0,0,0,0,0,0]
+
 
     '''
     if rp0.value():
