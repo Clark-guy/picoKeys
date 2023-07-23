@@ -45,13 +45,18 @@ playingNote = [0,0,0,0,0,0]
 
 
 def handleButton():
-
+    global playingNote
     spkr = PWM(Pin(0))
     spkr.duty_u16(duty)
+    #del playingNote[:]
+    #for button in buttonsPressed:
+    #    playingNote.append(0)
+
     
     #when no other notes playing, play note pressed
     if all(v==0 for v in previousPressed):
         print("first note!")
+        playingNote = buttonsPressed
         #expected behaviour:
         # when first note pressed, that note becomes playing note
         # when notes added, playing note changes to most recently
@@ -65,15 +70,35 @@ def handleButton():
         # playing note to most recently pressed key
         #spkr.freq(pitchList[])
     elif previousPressed != buttonsPressed:
-
+        #check if note was added or removed
+        if(sum(previousPressed)>sum(buttonsPressed)):
+            print("removed")
+            #maybe when each new button is pressed, it should just push those indexes to an array 
+            # which orders all the buttons pressed, so you can unwind what key is pressed
+        else:
+            #find new key
+            #zip together previousPressed and buttonsPressed
+            #grab the difference
+            #assume only one new key pressed - go through list of previous pressed.
+            #if previous is 0, and current is 1, set playingNote to be that one
+            for buttonIndex in range(len(buttonsPressed)):
+                if buttonsPressed[buttonIndex] == 1:
+                    #check against previousPressed, if previousPressed is zero, set that as new button and.. break?
+                    if previousPressed[buttonIndex] == 0:
+                        playingNote = [0,0,0,0,0,0]
+                        playingNote[buttonIndex] = 1
+                        break
+                    pass #do something
+            print(zip(previousPressed,buttonsPressed))
+            print("added")
+            #keyReleased
+            #need to use
         print("changed note!")
         #spkr.freq()
 
     #rebuild playingNote and previousPressed
-    del playingNote[:]
     del previousPressed[:]
-    for button in buttonsPressed:
-        playingNote.append(button)
+    
     for button in buttonsPressed:
         previousPressed.append(button)
     
